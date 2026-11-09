@@ -22,12 +22,18 @@ def main():
     if difficulty == "easy":
         energy = 150
         health = 150
+        energy_multiplier = 1
+        trap_damage = 5
     elif difficulty == "normal":
         energy = 100
         health = 100
+        energy_multiplier = 1.5
+        trap_damage = 10
     elif difficulty == "hard":
         energy = 70
         health = 70
+        energy_multiplier = 2
+        trap_damage = 20
     else:
         print("Invalid difficulty. Please restart the game.")
         return
@@ -62,7 +68,10 @@ def main():
             break    
         else:
             print("Invalid loaction.Please choose from 1 to 4.")
-            continue    
+            continue
+
+        energy_cost *= energy_multiplier
+
         if energy >= energy_cost:
             energy -= energy_cost
             print(f"\nYou explored the {location}!")
@@ -84,8 +93,8 @@ def main():
                 print(f"New total score: {score}")
             elif event == 2:
                 print("Oh no! You encountered a trap!")
-                if health >= 10:
-                    health -= 10
+                if health >= trap_damage:
+                    health -= trap_damage
                 else:
                     health = 0
 
