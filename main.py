@@ -14,9 +14,20 @@ def main():
     
     score = 0
     exploration_count = 0
-    clues_found = 0
     lighthouse_unlocked = False
 
+    inventory = []
+
+    treasure_items = ["Golden Key", "Old Map", "Silver Coin"]
+
+    clue_items = [
+        "A broken lighthouse map",
+        "An old lighthouse symbol",
+        "A mysterious lighthouse message"
+    ]
+
+    clues_found = []
+    
     print(f"Player: {player_name}")
     while True:
         difficulty = input("choose difficulty (easy/normal/hard): ").strip().lower()
@@ -40,24 +51,24 @@ def main():
             break
         else:
             print("Invalid difficulty. Please choose again.")
+    max_energy = energy
+    rest_count = 0
+        
 
     print(f"Starting Energy: {energy}")
     print(f"Starting Health: {health}")
 
-    min_energy_cost = 10 * energy_multiplier            
 
-
-    while True:
-        if energy < min_energy_cost:
-            print("you do not have enough to continue.")
-            break
-
+    
+    while True:  
         print("\nChoose where you want to explore:")
         print("1. Beach")
         print("2. Jungle")
         print("3. Cave")
         print("4. Enter the Lost Lighthouse")
-        print("5. Quit")
+        print("5. Check Inventory")
+        print("6. Quit")
+        print("7. Rest and Restore Energy")
         
         choice = input("Choose a location: ").strip()
         
@@ -76,19 +87,49 @@ def main():
         elif choice == "4":
             if lighthouse_unlocked:
                 print("\nYou enter the lost Lighthouse.")
-                print("You have found the source of the island's mystery!.")
-                print("CONGRATULATION! YOU WIN.")
-                break
+                if "Golden Key" in inventory:
+                    print("Golden key fits!.")
+                    print("The hidden room is unlocked.")
+                    print("CONGRATULATION! YOU WIN.")
+                    break
+                else:
+                    print("You need  a Golden key to unlock the hidden room.")
+                    continue   
             else:
                 print("The Lighthouse is locked")
                 print("Find three clues before entering")
-                continue      
+                continue 
         elif choice == "5":
+            print("\nYOUR INVENTORY")
+
+            if inventory:
+                for item in inventory:
+                    print(f"- {item}")
+
+            else:
+                print("Your inventory is empty.")
+            continue
+        elif choice == "7":
+            if rest_count >= 2:
+                print("You  used all your opportunities.")
+            elif energy >= max_energy:
+                print("Your energy is already full. You do not need rest.")
+            else:
+                energy_restored = min(30, max_energy - energy)
+                energy += energy_restored
+                rest_count += 1
+
+                print("You take a rest")
+                print(f"Energy Restored: {energy_restored}")
+                print(f"Current Energy: {energy}")
+                print(f"Rest opportunities remaining: {2 - rest_count}")
+            continue                             
+        elif choice == "6":
             print("Thanks for playing")
             break    
         else:
-            print("Invalid loaction.Please choose from 1 to 4.")
-            continue
+            print("Invalid location.Please choose from 1 to 7.")
+            continue    
 
         energy_cost *= energy_multiplier
 
@@ -100,18 +141,22 @@ def main():
 
             score += points_earned
             exploration_count += 1
-            clues_found += 1
-
+            
             print(f"Points earned: {points_earned}")
             print(f"Total score: {score}")
-            print(f"Total clues found: {clues_found}")
 
             event = random.randint(1, 10)
 
             if event <= 2:
-                print("You discovered hiddin treasure!")
+                print("You discovered hidden treasure!")
+                found_item = random.choice(treasure_items)
+                if found_item not in inventory:
+                    inventory.append(found_item)
+                    print(f"You collected: {found_item}")
+                else:
+                    print(f"You have the: {found_item}")    
                 score += 10
-                print("Bouns points: 10")
+                print("Bonus points: 10")
                 print(f"New total score: {score}")
             elif event <= 5:
                 print("Oh no! You encountered a trap!")
@@ -120,12 +165,24 @@ def main():
                 else:
                     health = 0
 
-                print(f"Healt remaining: {health}")    
+                print(f"Health remaining: {health}")
+            elif event <= 7:
+                available_clues = [
+                    clue for clue in clue_items
+                    if clue not in clues_found 
+                ]
+                if available_clues:
+                    found_clue = random.choice(available_clues)
+                    clues_found.append(found_clue)
 
+                    print(f"You discovered: {found_clue}")
+                    print(f"Total clues found: {len(clues_found)}")
+                else:
+                    print("You have already discovered all the clues.")        
             else:
                 print("Nothing unusual happens.")
 
-            if clues_found >= 3 and not lighthouse_unlocked:
+            if len(clues_found) >= 3 and not lighthouse_unlocked:
                 lighthouse_unlocked = True
                 print("\nCongratulation!")
                 print("You have discovered all three clues!.")
